@@ -1,11 +1,12 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+from datetime import datetime
 
 # Konfigurasi Halaman
 st.set_page_config(page_title="idMe Analysis SKTB", layout="wide")
 
-# --- TEMA PINK & CERAH ---
+# --- TEMA PINK & CERAH (PORTAL CIKGU MOON) ---
 st.markdown("""
     <style>
     .stApp { background-color: #fdf2f5; }
@@ -27,22 +28,31 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 🔗 LINK CSV DARI TAB DATA
+# 🔗 URL SEDUT DATA (Format CSV)
 url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSC4K9zTk5to3U37As72duwLP7GRqYMkauaAhjr6ANe8s6bl7Qz85ojUXeSDOYw3-iQkMvKV-gq4ZXf/pub?gid=272260181&single=true&output=csv"
 
-# Link Edit Tab (GID)
+# 🔗 ALAMAT EDIT (GID Yang Cikgu Bagi)
 base_url = "https://docs.google.com/spreadsheets/d/1y8BvpG0NN5WwwhSFWS2AOI4Qe8O4HYg5M-LPrMmzjk/edit"
 link_setiap_kelas = {
-    "D1 IBNU SINA": f"{base_url}#gid=336938430", "D1 IBNU KHALDUN": f"{base_url}#gid=648519110",
-    "D2 IBNU SINA": f"{base_url}#gid=851785168", "D2 IBNU KHALDUN": f"{base_url}#gid=2036307286",
-    "D3 IBNU SINA": f"{base_url}#gid=1435005895", "D3 IBNU KHALDUN": f"{base_url}#gid=1308911247",
-    "D4 IBNU SINA": f"{base_url}#gid=1228814365", "D4 IBNU KHALDUN": f"{base_url}#gid=749204493",
-    "D5 IBNU SINA": f"{base_url}#gid=1273332386", "D5 IBNU KHALDUN": f"{base_url}#gid=2136815731",
-    "D6 IBNU SINA": f"{base_url}#gid=255757977", "D6 IBNU KHALDUN": f"{base_url}#gid=283583087",
-    "PRA AS-SYAFIE": f"{base_url}#gid=1872315757", "PRA AL-GHAZALI": f"{base_url}#gid=1285559833",
-    "PRA AL-MALIKI": f"{base_url}#gid=1820910864", "PPKI AL-BIRUNI": f"{base_url}#gid=646110232",
-    "PPKI AL-FARABI": f"{base_url}#gid=378583943", "PPKI AL-KHAWARIZMI": f"{base_url}#gid=515727477",
-    "KESELURUHAN": f"{base_url}#gid=272260181"
+    "D1 IBNU SINA": f"{base_url}#gid=336938430",
+    "D1 IBNU KHALDUN": f"{base_url}#gid=648519110",
+    "D2 IBNU SINA": f"{base_url}#gid=851785168",
+    "D2 IBNU KHALDUN": f"{base_url}#gid=2036307286",
+    "D3 IBNU SINA": f"{base_url}#gid=1435005895",
+    "D3 IBNU KHALDUN": f"{base_url}#gid=1308911247",
+    "D4 IBNU SINA": f"{base_url}#gid=1228814365",
+    "D4 IBNU KHALDUN": f"{base_url}#gid=749204493",
+    "D5 IBNU SINA": f"{base_url}#gid=1273332386",
+    "D5 IBNU KHALDUN": f"{base_url}#gid=2136815731",
+    "D6 IBNU SINA": f"{base_url}#gid=255757977",
+    "D6 IBNU KHALDUN": f"{base_url}#gid=283583087",
+    "PRA AS-SYAFIE": f"{base_url}#gid=1872315757",
+    "PRA AL-GHAZALI": f"{base_url}#gid=1285559833",
+    "PRA AL-MALIKI": f"{base_url}#gid=1820910864",
+    "PPKI AL-BIRUNI": f"{base_url}#gid=646110232",
+    "PPKI AL-FARABI": f"{base_url}#gid=378583943",
+    "PPKI AL-KHAWARIZMI": f"{base_url}#gid=515727477",
+    "KESELURUHAN Sekolah": f"{base_url}#gid=272260181"
 }
 
 @st.cache_data(ttl=2)
@@ -50,10 +60,14 @@ def load_data():
     df = pd.read_csv(url)
     df.columns = [str(c).strip().upper() for c in df.columns]
     df.rename(columns={df.columns[0]: 'KELAS', df.columns[1]: 'NAMA_MURID'}, inplace=True)
+    
+    # Tapis data sampah
     df = df[df['KELAS'].astype(str).str.contains('IBNU|PRA|PPKI', case=False, na=False)]
     
+    # Kategori ralat (C-M)
     ralat_cols = ['ALAMAT', 'POSKOD', 'TIADA P1', 'TIADA P2', 'P1 = P2', 'HUB P1', 'HUB P2', 'TANGGUNGAN', 'TIADA HP P1', 'PENDAPATAN', 'AKAUN OKU']
     existing_ralat = [c for c in ralat_cols if c in df.columns]
+    
     df['TOTAL_RALAT'] = df[existing_ralat].notna().sum(axis=1)
     return df, existing_ralat
 
@@ -64,14 +78,15 @@ try:
         st.markdown("### 🌸 Menu Carian")
         senarai_kelas = sorted(df_master['KELAS'].unique().tolist())
         pilihan = st.selectbox("Pilih Kelas:", ["KESELURUHAN Sekolah"] + senarai_kelas)
-        if st.button('🔄 Refresh'):
+        if st.button('🔄 Refresh Data'):
             st.cache_data.clear()
             st.rerun()
+        st.write(f"Kemaskini: {datetime.now().strftime('%H:%M:%S')}")
 
     st.markdown(f"<h1>🎀 Portal Analisis Ralat SKTB 🎀</h1>", unsafe_allow_html=True)
     
-    link_key = pilihan if pilihan != "KESELURUHAN Sekolah" else "KESELURUHAN"
-    link_edit = link_setiap_kelas.get(link_key, link_setiap_kelas["KESELURUHAN"])
+    # Butang Link Dinamik mengikut GID
+    link_edit = link_setiap_kelas.get(pilihan, link_setiap_kelas["KESELURUHAN Sekolah"])
     st.markdown(f'<center><a href="{link_edit}" target="_blank" class="edit-button">📝 Klik Untuk Kemaskini Data {pilihan}</a></center>', unsafe_allow_html=True)
 
     df_display = df_master if pilihan == "KESELURUHAN Sekolah" else df_master[df_master['KELAS'] == pilihan]
@@ -79,11 +94,7 @@ try:
     # Stats
     total_r = int(df_display['TOTAL_RALAT'].sum())
     murid_r = len(df_display[df_display['TOTAL_RALAT'] > 0])
-    
-    # --- LOGIK KELAS TERBAIK (DIKUNCI KE 6 IBNU SINA) ---
-    # Jika Cikgu nak sistem cari automatik, guna idxmin(). 
-    # Tapi kalau nak paksa 6 Ibnu Sina jadi juara:
-    kelas_terbaik = "6 IBNU SINA" 
+    kelas_terbaik = "6 IBNU SINA" # Juara Pilihan Cikgu Moon
 
     st.markdown(f"""
     <div class="card-container">
@@ -115,4 +126,4 @@ try:
         st.success(f"🎉 Tahniah! Kelas {pilihan} sudah tiada ralat.")
 
 except Exception as e:
-    st.error(f"Ralat: {e}")
+    st.error(f"Sila refresh semula: {e}")
