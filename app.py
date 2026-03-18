@@ -27,12 +27,11 @@ st.markdown("""
 # 🔗 URL CSV (Link sedut data - Link ni dah betul)
 url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSC4K9zTk5to3U37As72duwLP7GRqYMkauaAhjr6ANe8s6bl7Qz85ojUXeSDOYw3-iQkMvKV-gq4ZXf/pub?gid=272260181&single=true&output=csv"
 
-# 🔗 ID FAIL YANG BETUL (SFWS - Bukan SFWNS)
-# ID: 1y8BvpG0NN5WwwhSFWS2AOI4Qe8O4HYg5M-LPrMmzjk
-base_edit = "https://docs.google.com/spreadsheets/d/1y8BvpG0NN5WwwhSFWS2AOI4Qe8O4HYg5M-LPrMmzjk/edit"
+
+base_edit = "https://docs.google.com/spreadsheets/d/1y8BvpG0NN5wWwhSFWNS2AOI4Qe8O4HYg5M-LPrMmzjk/edit?"
 
 link_setiap_kelas = {
-    "D1 IBNU SINA": f"{base_edit}?gid=336938430",
+    "D1 IBNU SINA": f"{base_edit}?gid=336938430#gid=336938430",
     "D1 IBNU KHALDUN": f"{base_edit}?gid=648519110",
     "D2 IBNU SINA": f"{base_edit}?gid=851785168",
     "D2 IBNU KHALDUN": f"{base_edit}?gid=2036307286",
