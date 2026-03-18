@@ -31,30 +31,30 @@ st.markdown("""
 # 🔗 URL CSV UNTUK SEDUT DATA
 url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSC4K9zTk5to3U37As72duwLP7GRqYMkauaAhjr6ANe8s6bl7Qz85ojUXeSDOYw3-iQkMvKV-gq4ZXf/pub?gid=272260181&single=true&output=csv"
 
-# 🔗 LINK EDIT UTAMA (BUBU DAH COPY SEBIJI DARI GAMBAR CIKGU)
-# ID: 1y8BvpG0NN5WwwhSFWS2AOI4Qe8O4HYg5M-LPrMmzjk
+# 🔗 LINK EDIT UTAMA (BUBU DAH PENDEKKAN IKUT ORIGINAL)
+# Link ID: 1y8BvpG0NN5WwwhSFWS2AOI4Qe8O4HYg5M-LPrMmzjk
 base_edit = "https://docs.google.com/spreadsheets/d/1y8BvpG0NN5WwwhSFWS2AOI4Qe8O4HYg5M-LPrMmzjk/edit"
 
 link_setiap_kelas = {
-    "D1 IBNU SINA": f"{base_edit}?gid=336938430#gid=336938430",
-    "D1 IBNU KHALDUN": f"{base_edit}?gid=648519110#gid=648519110",
-    "D2 IBNU SINA": f"{base_edit}?gid=851785168#gid=851785168",
-    "D2 IBNU KHALDUN": f"{base_edit}?gid=2036307286#gid=2036307286",
-    "D3 IBNU SINA": f"{base_edit}?gid=1435005895#gid=1435005895",
-    "D3 IBNU KHALDUN": f"{base_edit}?gid=1308911247#gid=1308911247",
-    "D4 IBNU SINA": f"{base_edit}?gid=1228814365#gid=1228814365",
-    "D4 IBNU KHALDUN": f"{base_edit}?gid=749204493#gid=749204493",
-    "D5 IBNU SINA": f"{base_edit}?gid=1273332386#gid=1273332386",
-    "D5 IBNU KHALDUN": f"{base_edit}?gid=2136815731#gid=2136815731",
-    "D6 IBNU SINA": f"{base_edit}?gid=255757977#gid=255757977",
-    "D6 IBNU KHALDUN": f"{base_edit}?gid=283583087#gid=283583087",
-    "PRA AS-SYAFIE": f"{base_edit}?gid=1872315757#gid=1872315757",
-    "PRA AL-GHAZALI": f"{base_edit}?gid=1285559833#gid=1285559833",
-    "PRA AL-MALIKI": f"{base_edit}?gid=1820910864#gid=1820910864",
-    "PPKI AL-BIRUNI": f"{base_edit}?gid=646110232#gid=646110232",
-    "PPKI AL-FARABI": f"{base_edit}?gid=378583943#gid=378583943",
-    "PPKI AL-KHAWARIZMI": f"{base_edit}?gid=515727477#gid=515727477",
-    "KESELURUHAN Sekolah": f"{base_edit}?gid=272260181#gid=272260181"
+    "D1 IBNU SINA": f"{base_edit}?gid=336938430",
+    "D1 IBNU KHALDUN": f"{base_edit}?gid=648519110",
+    "D2 IBNU SINA": f"{base_edit}?gid=851785168",
+    "D2 IBNU KHALDUN": f"{base_edit}?gid=2036307286",
+    "D3 IBNU SINA": f"{base_edit}?gid=1435005895",
+    "D3 IBNU KHALDUN": f"{base_edit}?gid=1308911247",
+    "D4 IBNU SINA": f"{base_edit}?gid=1228814365",
+    "D4 IBNU KHALDUN": f"{base_edit}?gid=749204493",
+    "D5 IBNU SINA": f"{base_edit}?gid=1273332386",
+    "D5 IBNU KHALDUN": f"{base_edit}?gid=2136815731",
+    "D6 IBNU SINA": f"{base_edit}?gid=255757977",
+    "D6 IBNU KHALDUN": f"{base_edit}?gid=283583087",
+    "PRA AS-SYAFIE": f"{base_edit}?gid=1872315757",
+    "PRA AL-GHAZALI": f"{base_edit}?gid=1285559833",
+    "PRA AL-MALIKI": f"{base_edit}?gid=1820910864",
+    "PPKI AL-BIRUNI": f"{base_edit}?gid=646110232",
+    "PPKI AL-FARABI": f"{base_edit}?gid=378583943",
+    "PPKI AL-KHAWARIZMI": f"{base_edit}?gid=515727477",
+    "KESELURUHAN Sekolah": f"{base_edit}?gid=272260181"
 }
 
 @st.cache_data(ttl=2)
@@ -76,14 +76,14 @@ try:
         st.markdown("### 🌸 Menu Carian")
         senarai_kelas = sorted(df_master['KELAS'].unique().tolist())
         pilihan = st.selectbox("Pilih Kelas:", ["KESELURUHAN Sekolah"] + senarai_kelas)
-        if st.button('🔄 Refresh'):
+        if st.button('🔄 Refresh Data'):
             st.cache_data.clear()
             st.rerun()
         st.write(f"Masa: {datetime.now().strftime('%H:%M:%S')}")
 
     st.markdown(f"<h1>🎀 Portal Analisis Ralat SKTB 🎀</h1>", unsafe_allow_html=True)
     
-    # BUTANG PINK DINAMIK
+    # BUTANG PINK DINAMIK (LINK PENDEK)
     link_edit = link_setiap_kelas.get(pilihan, link_setiap_kelas["KESELURUHAN Sekolah"])
     st.markdown(f'<center><a href="{link_edit}" target="_blank" class="edit-button">📝 Klik Untuk Kemaskini Data {pilihan}</a></center>', unsafe_allow_html=True)
 
