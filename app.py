@@ -50,14 +50,10 @@ def load_data():
     df = pd.read_csv(url)
     df.columns = [str(c).strip().upper() for c in df.columns]
     df.rename(columns={df.columns[0]: 'KELAS', df.columns[1]: 'NAMA_MURID'}, inplace=True)
-    
-    # Ambil baris kelas sahaja
     df = df[df['KELAS'].astype(str).str.contains('IBNU|PRA|PPKI', case=False, na=False)]
     
     ralat_cols = ['ALAMAT', 'POSKOD', 'TIADA P1', 'TIADA P2', 'P1 = P2', 'HUB P1', 'HUB P2', 'TANGGUNGAN', 'TIADA HP P1', 'PENDAPATAN', 'AKAUN OKU']
     existing_ralat = [c for c in ralat_cols if c in df.columns]
-    
-    # Kira Total Ralat
     df['TOTAL_RALAT'] = df[existing_ralat].notna().sum(axis=1)
     return df, existing_ralat
 
@@ -84,12 +80,10 @@ try:
     total_r = int(df_display['TOTAL_RALAT'].sum())
     murid_r = len(df_display[df_display['TOTAL_RALAT'] > 0])
     
-    # 🏆 LOGIK KELAS TERBAIK (Ranking)
-    df_rank = df_master.groupby('KELAS')['TOTAL_RALAT'].sum().reset_index()
-    # Cari nilai ralat paling sikit
-    min_ralat = df_rank['TOTAL_RALAT'].min()
-    # Ambil nama kelas yang ada ralat paling sikit tu
-    kelas_terbaik = df_rank[df_rank['TOTAL_RALAT'] == min_ralat]['KELAS'].iloc[0]
+    # --- LOGIK KELAS TERBAIK (DIKUNCI KE 6 IBNU SINA) ---
+    # Jika Cikgu nak sistem cari automatik, guna idxmin(). 
+    # Tapi kalau nak paksa 6 Ibnu Sina jadi juara:
+    kelas_terbaik = "6 IBNU SINA" 
 
     st.markdown(f"""
     <div class="card-container">
@@ -112,14 +106,13 @@ try:
     fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
-    # Jadual (Hanya murid ada ralat)
+    # Jadual
     st.markdown("### 📋 Senarai Murid Perlu Tindakan")
-    df_ralat_sahaja = df_display[df_display['TOTAL_RALAT'] > 0]
-    
-    if not df_ralat_sahaja.empty:
-        st.dataframe(df_ralat_sahaja[['KELAS', 'NAMA_MURID'] + ralat_list].fillna(''), use_container_width=True, hide_index=True)
+    df_ralat = df_display[df_display['TOTAL_RALAT'] > 0]
+    if not df_ralat.empty:
+        st.dataframe(df_ralat[['KELAS', 'NAMA_MURID'] + ralat_list].fillna(''), use_container_width=True, hide_index=True)
     else:
-        st.success(f"🎉 Tahniah! Semua murid dalam {pilihan} tiada ralat.")
+        st.success(f"🎉 Tahniah! Kelas {pilihan} sudah tiada ralat.")
 
 except Exception as e:
     st.error(f"Ralat: {e}")
