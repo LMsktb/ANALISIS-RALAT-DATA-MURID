@@ -31,8 +31,9 @@ st.markdown("""
 # 🔗 URL CSV UNTUK SEDUT DATA
 url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSC4K9zTk5to3U37As72duwLP7GRqYMkauaAhjr6ANe8s6bl7Qz85ojUXeSDOYw3-iQkMvKV-gq4ZXf/pub?gid=272260181&single=true&output=csv"
 
-
-base_edit = "https://docs.google.com/spreadsheets/d/1y8BvpG0NN5wWwhSFWNS2AOI4Qe8O4HYg5M-LPrMmzjk/edit?"
+# 🔗 LINK EDIT UTAMA (BUBU DAH COPY SEBIJI DARI GAMBAR CIKGU)
+# ID: 1y8BvpG0NN5WwwhSFWS2AOI4Qe8O4HYg5M-LPrMmzjk
+base_edit = "https://docs.google.com/spreadsheets/d/1y8BvpG0NN5WwwhSFWS2AOI4Qe8O4HYg5M-LPrMmzjk/edit"
 
 link_setiap_kelas = {
     "D1 IBNU SINA": f"{base_edit}?gid=336938430#gid=336938430",
@@ -53,7 +54,7 @@ link_setiap_kelas = {
     "PPKI AL-BIRUNI": f"{base_edit}?gid=646110232#gid=646110232",
     "PPKI AL-FARABI": f"{base_edit}?gid=378583943#gid=378583943",
     "PPKI AL-KHAWARIZMI": f"{base_edit}?gid=515727477#gid=515727477",
-    "KESELURUHAN sekolah": f"{base_edit}?gid=272260181#gid=272260181"
+    "KESELURUHAN Sekolah": f"{base_edit}?gid=272260181#gid=272260181"
 }
 
 @st.cache_data(ttl=2)
@@ -75,7 +76,7 @@ try:
         st.markdown("### 🌸 Menu Carian")
         senarai_kelas = sorted(df_master['KELAS'].unique().tolist())
         pilihan = st.selectbox("Pilih Kelas:", ["KESELURUHAN Sekolah"] + senarai_kelas)
-        if st.button('🔄 Refresh Data'):
+        if st.button('🔄 Refresh'):
             st.cache_data.clear()
             st.rerun()
         st.write(f"Masa: {datetime.now().strftime('%H:%M:%S')}")
