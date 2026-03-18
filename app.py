@@ -16,7 +16,7 @@ st.markdown("""
     }
     h1, h3 { color: #ff4d88; text-align: center; font-family: 'Comic Sans MS', cursive; }
     .edit-button {
-        background-color: #ff4d88; color: white !important; padding: 12px 25px;
+        background-color: #ff4d88 !important; color: white !important; padding: 12px 25px;
         text-align: center; border-radius: 12px; text-decoration: none;
         display: inline-block; font-weight: bold; margin-bottom: 25px; border: 2px solid #ffb6c1;
     }
@@ -24,11 +24,12 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 🔗 LINK CSV (Untuk sedut data - Sila pastikan ini link CSV yang betul)
+# 🔗 URL CSV (Link sedut data - Link ni dah betul)
 url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSC4K9zTk5to3U37As72duwLP7GRqYMkauaAhjr6ANe8s6bl7Qz85ojUXeSDOYw3-iQkMvKV-gq4ZXf/pub?gid=272260181&single=true&output=csv"
 
-# 🔗 LINK EDIT ASAL (Bubu ambil sebiji dari link yang Cikgu paste tadi)
-base_edit = "https://docs.google.com/spreadsheets/d/1y8BvpG0NN5WwwhSFWNS2AOI4Qe8O4HYg5M-LPrMmzjk/edit"
+# 🔗 ID FAIL YANG BETUL (SFWS - Bukan SFWNS)
+# ID: 1y8BvpG0NN5WwwhSFWS2AOI4Qe8O4HYg5M-LPrMmzjk
+base_edit = "https://docs.google.com/spreadsheets/d/1y8BvpG0NN5WwwhSFWS2AOI4Qe8O4HYg5M-LPrMmzjk/edit"
 
 link_setiap_kelas = {
     "D1 IBNU SINA": f"{base_edit}?gid=336938430",
@@ -58,11 +59,9 @@ def load_data():
         df = pd.read_csv(url)
         df.columns = [str(c).strip().upper() for c in df.columns]
         df.rename(columns={df.columns[0]: 'KELAS', df.columns[1]: 'NAMA_MURID'}, inplace=True)
-        # Tapis hanya baris kelas
         df = df[df['KELAS'].astype(str).str.contains('IBNU|PRA|PPKI', case=False, na=False)]
-        # Kira ralat
-        ralat_list = ['ALAMAT', 'POSKOD', 'TIADA P1', 'TIADA P2', 'P1 = P2', 'HUB P1', 'HUB P2', 'TANGGUNGAN', 'TIADA HP P1', 'PENDAPATAN', 'AKAUN OKU']
-        existing_ralat = [c for c in ralat_list if c in df.columns]
+        ralat_cols = ['ALAMAT', 'POSKOD', 'TIADA P1', 'TIADA P2', 'P1 = P2', 'HUB P1', 'HUB P2', 'TANGGUNGAN', 'TIADA HP P1', 'PENDAPATAN', 'AKAUN OKU']
+        existing_ralat = [c for c in ralat_cols if c in df.columns]
         df['TOTAL_RALAT'] = df[existing_ralat].notna().sum(axis=1)
         return df, existing_ralat
     except:
@@ -85,18 +84,15 @@ try:
 
     st.markdown(f"<h1>🎀 Portal Analisis Ralat SKTB 🎀</h1>", unsafe_allow_html=True)
     
-    # Butang Link Pink
+    # BUTANG PINK DINAMIK
     link_edit = link_setiap_kelas.get(pilihan, link_setiap_kelas["KESELURUHAN Sekolah"])
     st.markdown(f'<center><a href="{link_edit}" target="_blank" class="edit-button">📝 Klik Untuk Kemaskini Data {pilihan}</a></center>', unsafe_allow_html=True)
 
     if not df_master.empty:
         df_display = df_master if pilihan == "KESELURUHAN Sekolah" else df_master[df_master['KELAS'] == pilihan]
-        
-        # Stats
         total_r = int(df_display['TOTAL_RALAT'].sum())
         kelas_terbaik = "6 IBNU SINA"
 
-        st.columns(1) # Spacing
         st.markdown(f"""
         <div style="display: flex; gap: 10px;">
             <div class="metric-card"><h4>Kelas Terbaik 🏆</h4><h2 style="color:#4CAF50;">{kelas_terbaik}</h2></div>
@@ -124,7 +120,7 @@ try:
         df_ralat = df_display[df_display['TOTAL_RALAT'] > 0]
         st.dataframe(df_ralat[['KELAS', 'NAMA_MURID'] + ralat_list].fillna(''), use_container_width=True, hide_index=True)
     else:
-        st.warning("Menunggu data ditarik dari Google Sheets... Sila tekan butang Refresh.")
+        st.warning("Menunggu data...")
 
 except Exception as e:
     st.error(f"Sila cuba lagi: {e}")
