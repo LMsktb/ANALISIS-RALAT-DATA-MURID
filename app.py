@@ -53,7 +53,7 @@ link_setiap_kelas = {
     "PPKI AL-BIRUNI": f"{base_edit}?gid=646110232#gid=646110232",
     "PPKI AL-FARABI": f"{base_edit}?gid=378583943#gid=378583943",
     "PPKI AL-KHAWARIZMI": f"{base_edit}?gid=515727477#gid=515727477",
-    "KESELURUHAN": f"{base_edit}?gid=272260181#gid=272260181"
+    "KESELURUHAN sekolah": f"{base_edit}?gid=272260181#gid=272260181"
 }
 
 @st.cache_data(ttl=2)
