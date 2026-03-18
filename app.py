@@ -46,25 +46,18 @@ link_setiap_kelas = {
 
 @st.cache_data(ttl=2)
 def load_data():
-    # 💡 KEMASKINI: Kita baca semua data dulu tanpa skip apa-apa
-    df = pd.read_csv(url)
+    # 💡 KEMASKINI: Skip 2 baris teratas terus untuk elakkan 'Table1' atau ruang kosong
+    df = pd.read_csv(url, header=None, skiprows=2)
     
-    # Kadang-kadang Google Sheets letak 'Table1' kat row pertama. 
-    # Kita cari baris mana yang ada perkataan 'D1 IBNU SINA' atau mana-mana kelas.
-    # Kita paksa namakan kolum ikut turutan yang kita nampak dalam screenshot.
-    
-    # Kita filter row yang betul-betul ada data kelas sahaja
-    # Kita check kolum pertama (Column index 0)
-    df = df[df.iloc[:, 0].astype(str).str.contains('IBNU|PRA|PPKI', case=False, na=False)]
-    
-    # Namakan semula kolum secara manual (Hardcoded)
+    # Namakan semula kolum secara manual ikut apa Bubu nampak kat screenshot
     new_cols = ['KELAS', 'NAMA_MURID', 'ALAMAT', 'POSKOD', 'TIADA_P1', 'TIADA_P2', 'P1_P2', 'HUB_P1', 'HUB_P2', 'TANGGUNGAN', 'TIADA_HP_P1', 'PENDAPATAN', 'AKAUN_OKU', 'SELESAI']
     df.columns = new_cols[:len(df.columns)]
     
-    # Kategori ralat (Kolum 3 hingga 13)
-    ralat_list = ['ALAMAT', 'POSKOD', 'TIADA_P1', 'TIADA_P2', 'P1_P2', 'HUB_P1', 'HUB_P2', 'TANGGUNGAN', 'TIADA_HP_P1', 'PENDAPATAN', 'AKAUN_OKU']
+    # Buang baris yang tak ada nama murid
+    df = df.dropna(subset=['NAMA_MURID'])
     
-    # Kira Total Ralat (Check tick ✓)
+    # Kategori ralat (Check tick ✓)
+    ralat_list = ['ALAMAT', 'POSKOD', 'TIADA_P1', 'TIADA_P2', 'P1_P2', 'HUB_P1', 'HUB_P2', 'TANGGUNGAN', 'TIADA_HP_P1', 'PENDAPATAN', 'AKAUN_OKU']
     df['TOTAL_RALAT_AUTO'] = df[ralat_list].notna().sum(axis=1)
     
     return df, ralat_list
@@ -75,7 +68,7 @@ try:
     # Menu Sidebar
     with st.sidebar:
         st.markdown("### 🌸 Menu Carian")
-        senarai_kelas = sorted(df_master['KELAS'].unique().tolist())
+        senarai_kelas = sorted(df_master['KELAS'].dropna().unique().tolist())
         pilihan_kelas = st.selectbox("Pilih Kelas:", ["KESELURUHAN Sekolah"] + senarai_kelas)
         if st.button('🔄 Refresh'):
             st.cache_data.clear()
@@ -88,7 +81,7 @@ try:
     link_edit = link_setiap_kelas.get(key_link, link_setiap_kelas["KESELURUHAN"])
     st.markdown(f'<center><a href="{link_edit}" target="_blank" class="edit-button">📝 Klik Untuk Kemaskini Data {pilihan_kelas}</a></center>', unsafe_allow_html=True)
 
-    # Tapis Data
+    # Filter Data
     df_display = df_master if pilihan_kelas == "KESELURUHAN Sekolah" else df_master[df_master['KELAS'] == pilihan_kelas]
     
     # Metrics
@@ -122,4 +115,4 @@ try:
     st.dataframe(df_table.fillna(''), use_container_width=True, hide_index=True)
 
 except Exception as e:
-    st.error(f"Alamak, ada masalah teknikal: {e}")
+    st.error(f"Sila pastikan data anda bermula dari baris ke-2 atau ke-3 di Google Sheet: {e}")
