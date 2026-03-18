@@ -20,23 +20,22 @@ st.markdown("<div class='stHeader'><h1>ðŸŒ¸ Dashboard Analisis Ralat idMe SKTB ð
 st.write("")
 
 # --- SAMBUNGAN GOOGLE SHEETS ---
-url = "https://docs.google.com/spreadsheets/d/1y8BvpG0NN5WwwhSFWS2AOI4Qe8O4HYg5M-LPrMmzjk/edit#gid=1718218161"
-
-conn = st.connection("gsheets", type=GSheetsConnection)
+# Kita tukar link sikit supaya dia terus sedut data sebagai CSV (Lagi laju & stabil)
+sheet_id = "1y8BvpG0NN5WwwhSFWS2AOI4Qe8O4HYg5M-LPrMmzjk"
+url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid=1718218161"
 
 try:
-    # Kita baca tab 'DASHBOARD'
-    # header=7 bermaksud kita mula baca dari baris ke-8 (A8 & B8)
-    df_raw = conn.read(spreadsheet=url, worksheet="DASHBOARD", ttl="10s", header=7)
+    # Kita guna pandas biasa (pd.read_csv) supaya tak perlu 'Secrets' yang pening tu
+    # skiprows=7 bermaksud kita lompat 7 baris atas (mula baca dari baris 8)
+    df_raw = pd.read_csv(url, skiprows=7)
     
-    # Pilih Kolum A & B sahaja (Kelas & Jumlah Ralat)
+    # Pilih 2 kolum pertama (Kelas & Jumlah Ralat)
     df = df_raw.iloc[:, [0, 1]].copy()
     df.columns = ['Kelas', 'Jumlah Ralat']
     
-    # 1. Bersihkan data: Buang row yang tak ada nama kelas
-    # 2. Buang row '457' (jumlah besar kat bawah tu) supaya carta tak pelik
+    # Bersihkan data: Buang row kosong dan row total kat bawah
     df = df.dropna(subset=['Kelas'])
-    df = df[df['Kelas'] != '457'] # Elakkan ambil total bawah sekali sebagai kelas
+    df = df[df['Kelas'].astype(str).str.contains('IBNU|PRA|PPKI', case=False, na=False)]
     
     # Tukar Jumlah Ralat kepada nombor
     df['Jumlah Ralat'] = pd.to_numeric(df['Jumlah Ralat'], errors='coerce').fillna(0)
@@ -44,6 +43,7 @@ try:
 except Exception as e:
     st.error(f"Alamak! Ada masalah teknikal: {e}")
     st.stop()
+    
 # --- RINGKASAN ATAS ---
 total_ralat = df['Jumlah Ralat'].sum()
 col1, col2, col3 = st.columns(3)
