@@ -20,24 +20,24 @@ st.markdown("<div class='stHeader'><h1>ðŸŒ¸ Dashboard Analisis Ralat idMe SKTB ð
 st.write("")
 
 # --- SAMBUNGAN GOOGLE SHEETS ---
-# Kita tukar link sikit supaya dia terus sedut data sebagai CSV (Lagi laju & stabil)
-sheet_id = "1y8BvpG0NN5WwwhSFWS2AOI4Qe8O4HYg5M-LPrMmzjk"
-url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv&gid=1718218161"
+# Guna link "Publish to Web" yang Bubu bagi tadi
+url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSC4K9zTk5to3U37As72duwLP7GRqYMkauaAhjr6ANe8s6bl7Qz85ojUXeSDOYw3-iQkMvKV-gq4ZXf/pub?output=csv"
 
 try:
-    # Kita guna pandas biasa (pd.read_csv) supaya tak perlu 'Secrets' yang pening tu
-    # skiprows=7 bermaksud kita lompat 7 baris atas (mula baca dari baris 8)
+    # Kita baca data terus guna pandas
+    # skiprows=7 supaya dia mula baca dari baris 8 (Kelas & Jumlah Ralat)
     df_raw = pd.read_csv(url, skiprows=7)
     
-    # Pilih 2 kolum pertama (Kelas & Jumlah Ralat)
+    # Ambil 2 kolum pertama (Kelas & Jumlah Ralat)
     df = df_raw.iloc[:, [0, 1]].copy()
     df.columns = ['Kelas', 'Jumlah Ralat']
     
-    # Bersihkan data: Buang row kosong dan row total kat bawah
+    # Bersihkan data: Ambil row yang ada nama kelas sahaja
     df = df.dropna(subset=['Kelas'])
+    # Kod ni akan tapis supaya dia ambil row yang ada perkataan IBNU, PRA atau PPKI sahaja
     df = df[df['Kelas'].astype(str).str.contains('IBNU|PRA|PPKI', case=False, na=False)]
     
-    # Tukar Jumlah Ralat kepada nombor
+    # Tukar Jumlah Ralat kepada nombor (kalau kosong jadi 0)
     df['Jumlah Ralat'] = pd.to_numeric(df['Jumlah Ralat'], errors='coerce').fillna(0)
     
 except Exception as e:
