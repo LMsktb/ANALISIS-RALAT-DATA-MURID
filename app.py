@@ -5,7 +5,7 @@ import plotly.express as px
 # Konfigurasi Halaman
 st.set_page_config(page_title="idMe Analysis SKTB", layout="wide")
 
-# --- TEMA CERAH & PINK (PORTAL VIBE) ---
+# --- TEMA CERAH & PINK ---
 st.markdown("""
     <style>
     .stApp { background-color: #fdf2f5; }
@@ -27,7 +27,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# URL Master CSV (DATA)
+# URL Master CSV
 url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSC4K9zTk5to3U37As72duwLP7GRqYMkauaAhjr6ANe8s6bl7Qz85ojUXeSDOYw3-iQkMvKV-gq4ZXf/pub?output=csv"
 
 # Link Edit Tab (GID)
@@ -47,23 +47,24 @@ link_setiap_kelas = {
 @st.cache_data(ttl=2)
 def load_data():
     df = pd.read_csv(url)
-    df = df.loc[:, ~df.columns.duplicated()] # Buang kolum duplicate
+    df = df.loc[:, ~df.columns.duplicated()]
     df.columns = [str(c).strip().upper() for c in df.columns]
     
     col_kelas = 'KELAS' if 'KELAS' in df.columns else df.columns[0]
     col_nama = 'NAMA MURID' if 'NAMA MURID' in df.columns else df.columns[1]
     
+    # 💡 FILTER PINTAR: Ambil baris yang ada nama kelas sahaja (Buang nama orang terselip)
+    df = df[df[col_kelas].astype(str).str.contains('IBNU|PRA|PPKI', case=False, na=False)]
+    
     ralat_list = ['ALAMAT', 'POSKOD', 'TIADA P1', 'TIADA P2', 'P1 = P2', 'HUB P1', 'HUB P2', 'TANGGUNGAN', 'TIADA HP P1', 'PENDAPATAN', 'AKAUN OKU']
     existing_ralat = [c for c in ralat_list if c in df.columns]
     
-    # Kira ralat secara dinamik
     df['TOTAL_RALAT_AUTO'] = df[existing_ralat].notna().sum(axis=1)
     return df, existing_ralat, col_kelas, col_nama
 
 try:
     df_master, ralat_list, col_kelas, col_nama = load_data()
     
-    # --- SIDEBAR ---
     with st.sidebar:
         st.markdown("### 🌸 Menu Carian")
         senarai_kelas = sorted(df_master[col_kelas].dropna().unique().tolist())
@@ -72,22 +73,19 @@ try:
             st.cache_data.clear()
             st.rerun()
 
-    # --- DASHBOARD UTAMA ---
     st.markdown(f"<h1>🎀 Portal Analisis Ralat SKTB 🎀</h1>", unsafe_allow_html=True)
     
-    # Butang Link Edit Dinamik
-    link_key = pilihan_kelas if pilihan_kelas != "KESELURUHAN Sekolah" else "KESELURUHAN"
-    link_edit = link_setiap_kelas.get(link_key, link_setiap_kelas["KESELURUHAN"])
+    key_link = pilihan_kelas if pilihan_kelas != "KESELURUHAN Sekolah" else "KESELURUHAN"
+    link_edit = link_setiap_kelas.get(key_link, link_setiap_kelas["KESELURUHAN"])
     st.markdown(f'<center><a href="{link_edit}" target="_blank" class="edit-button">📝 Klik Untuk Kemaskini Data {pilihan_kelas}</a></center>', unsafe_allow_html=True)
 
-    # Filter Data
     df_display = df_master if pilihan_kelas == "KESELURUHAN Sekolah" else df_master[df_master[col_kelas] == pilihan_kelas]
     
-    # --- KAD STATISTIK (METRICS) ---
+    # Metrics
     total_ralat = int(df_display['TOTAL_RALAT_AUTO'].sum())
     murid_terlibat = len(df_display[df_display['TOTAL_RALAT_AUTO'] > 0])
     
-    # Cari Kelas Terbaik (Ranking)
+    # Ranking Kelas Terbaik (Bukan murid terbaik)
     df_rank = df_master.groupby(col_kelas)['TOTAL_RALAT_AUTO'].sum().reset_index()
     kelas_terbaik = df_rank.loc[df_rank['TOTAL_RALAT_AUTO'].idxmin(), col_kelas]
 
@@ -100,13 +98,15 @@ try:
     </div>
     """, unsafe_allow_html=True)
 
-    # --- GRAF PRESTASI ---
+    # Graf
     if pilihan_kelas == "KESELURUHAN Sekolah":
         st.markdown("<p style='text-align:center; font-weight:bold;'>Statistik Ralat Mengikut Semua Kelas</p>", unsafe_allow_html=True)
+        # Graf tunjuk ralat ikut KELAS (D1, D2, dll)
         df_graph = df_display.groupby(col_kelas)['TOTAL_RALAT_AUTO'].sum().reset_index()
         fig = px.bar(df_graph, x=col_kelas, y='TOTAL_RALAT_AUTO', color=col_kelas, color_discrete_sequence=px.colors.qualitative.Pastel)
     else:
         st.markdown("<p style='text-align:center; font-weight:bold;'>Pecahan Kategori Ralat</p>", unsafe_allow_html=True)
+        # Graf tunjuk ralat ikut KATEGORI (Alamat, dll)
         df_cat = df_display[ralat_list].notna().sum().reset_index()
         df_cat.columns = ['KATEGORI', 'JUMLAH']
         fig = px.bar(df_cat, x='KATEGORI', y='JUMLAH', color='KATEGORI', color_discrete_sequence=px.colors.qualitative.Pastel)
@@ -114,10 +114,9 @@ try:
     fig.update_layout(plot_bgcolor='white', paper_bgcolor='rgba(0,0,0,0)', showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- JADUAL DETAIL MURID ---
     st.markdown("### 📋 Senarai Murid & Ralat Individu")
     display_cols = [col_kelas, col_nama] + ralat_list
     st.dataframe(df_display[df_display['TOTAL_RALAT_AUTO'] > 0][display_cols].fillna(''), use_container_width=True, hide_index=True)
 
 except Exception as e:
-    st.error(f"Sila pastikan tab DATA bermula dari Baris 1 dengan tajuk kolum yang betul: {e}")
+    st.error(f"Sila semak tab DATA di Google Sheet: {e}")
