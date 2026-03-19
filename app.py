@@ -6,11 +6,10 @@ from datetime import datetime
 # Konfigurasi Halaman
 st.set_page_config(page_title="idMe Analysis SKTB", layout="wide", page_icon="🎀")
 
-# --- DIRECT LINK LOGO SKTB (ID FAIL: 1XV1CIEWhms8jHqJGOKpSluqr7cxtSWrv) ---
-# Bubu dah tukar format link supaya Streamlit boleh baca terus
-logo_url = "https://lh3.googleusercontent.com/d/1XV1CIEWhms8jHqJGOKpSluqr7cxtSWrv"
+# --- DIRECT LINK LOGO SKTB ---
+logo_url = "https://drive.google.com/uc?export=download&id=1XV1CIEWhms8jHqJGOKpSluqr7cxtSWrv"
 
-# --- TEMA PINK ---
+# --- TEMA PINK & LAYOUT ---
 st.markdown("""
     <style>
     .stApp { background-color: #fdf2f5; }
@@ -23,6 +22,17 @@ st.markdown("""
     .metric-card h4 { color: #888; font-size: 14px; margin-bottom: 5px; }
     .metric-card h2 { color: #ff4d88; margin: 0; font-size: 28px; }
     h1, h3 { color: #ff4d88; text-align: center; font-family: 'Comic Sans MS', cursive; }
+    
+    /* Center Logo & Header */
+    .header-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 20px 0;
+    }
+    
     .edit-button {
         background-color: #ff4d88; color: white !important; padding: 12px 25px;
         text-align: center; border-radius: 12px; text-decoration: none;
@@ -35,7 +45,7 @@ st.markdown("""
 # 🔗 URL CSV UNTUK SEDUT DATA
 url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSC4K9zTk5to3U37As72duwLP7GRqYMkauaAhjr6ANe8s6bl7Qz85ojUXeSDOYw3-iQkMvKV-gq4ZXf/pub?gid=272260181&single=true&output=csv"
 
-base_edit = "https://docs.google.com/spreadsheets/d/1y8BvpG0NN5WwwhSFWNS2AOI4Qe8O4HYg5M-LPrMmzjk/edit?"
+base_edit = "https://docs.google.com/spreadsheets/d/1y8BvpG0NN5wWwhSFWNS2AOI4Qe8O4HYg5M-LPrMmzjk/edit?"
 
 link_setiap_kelas = {
     "D1 IBNU SINA": f"{base_edit}gid=336938430#gid=336938430",
@@ -75,8 +85,8 @@ try:
     df_master, ralat_list = load_data()
     
     with st.sidebar:
-        # Cuba panggil logo dalam sidebar
-        st.image(logo_url, width=150)
+        # Logo Sidebar
+        st.image(logo_url, width=100)
         st.markdown("### 🌸 Menu Carian")
         senarai_kelas = sorted(df_master['KELAS'].unique().tolist())
         pilihan = st.selectbox("Pilih Kelas:", ["KESELURUHAN Sekolah"] + senarai_kelas)
@@ -85,12 +95,11 @@ try:
             st.rerun()
         st.write(f"Masa: {datetime.now().strftime('%H:%M:%S')}")
 
-    # Paparan Logo Tengah
-    col_a, col_b, col_c = st.columns([1, 1, 1])
-    with col_b:
-        st.image(logo_url, width=150)
-
+    # --- HEADER UTAMA (CENTERED) ---
+    st.markdown('<div class="header-container">', unsafe_allow_html=True)
+    st.image(logo_url, width=150)
     st.markdown(f"<h1>🎀 Portal Analisis Ralat SKTB 🎀</h1>", unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
     
     # BUTANG PINK DINAMIK
     link_edit = link_setiap_kelas.get(pilihan, link_setiap_kelas["KESELURUHAN Sekolah"])
@@ -100,7 +109,6 @@ try:
     
     # Stats
     total_r = int(df_display['TOTAL_RALAT'].sum())
-    murid_r = len(df_display[df_display['TOTAL_RALAT'] > 0])
     kelas_terbaik = "6 IBNU SINA"
 
     st.markdown(f"""
@@ -117,9 +125,9 @@ try:
         df_g = df_display.groupby('KELAS')['TOTAL_RALAT'].sum().reset_index()
         fig = px.bar(df_g, x='KELAS', y='TOTAL_RALAT', color='KELAS', color_discrete_sequence=px.colors.qualitative.Pastel)
     else:
-        df_cat = df_display[ralat_list].notna().sum().reset_index()
-        df_cat.columns = ['Kategori', 'Jumlah']
-        fig = px.bar(df_cat, x='Kategori', y='Jumlah', color='Kategori', color_discrete_sequence=px.colors.qualitative.Pastel)
+        df_c = df_display[ralat_list].notna().sum().reset_index()
+        df_c.columns = ['Kategori', 'Jumlah']
+        fig = px.bar(df_c, x='Kategori', y='Jumlah', color='Kategori', color_discrete_sequence=px.colors.qualitative.Pastel)
 
     fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
