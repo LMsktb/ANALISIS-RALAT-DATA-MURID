@@ -6,12 +6,9 @@ from datetime import datetime
 # Konfigurasi Halaman
 st.set_page_config(page_title="idMe Analysis SKTB", layout="wide", page_icon="🎀")
 
-# --- FUNGSI TUKAR LINK GOOGLE DRIVE KE DIRECT LINK ---
-def get_direct_link(url):
-    file_id = url.split('/')[-2]
-    return f'https://drive.google.com/uc?export=download&id={file_id}'
-
-logo_url = get_direct_link("https://drive.google.com/file/d/1XV1CIEWhms8jHqJGOKpSluqr7cxtSWrv/view?usp=drive_link")
+# --- DIRECT LINK LOGO SKTB (ID FAIL: 1XV1CIEWhms8jHqJGOKpSluqr7cxtSWrv) ---
+# Bubu dah tukar format link supaya Streamlit boleh baca terus
+logo_url = "https://lh3.googleusercontent.com/d/1XV1CIEWhms8jHqJGOKpSluqr7cxtSWrv"
 
 # --- TEMA PINK ---
 st.markdown("""
@@ -32,7 +29,6 @@ st.markdown("""
         display: inline-block; font-weight: bold; margin-bottom: 25px; border: 2px solid #ffb6c1;
     }
     section[data-testid="stSidebar"] { background-color: #fff0f5; border-right: 2px solid #ffc1d6; }
-    .centered-logo { display: block; margin-left: auto; margin-right: auto; width: 120px; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -79,8 +75,8 @@ try:
     df_master, ralat_list = load_data()
     
     with st.sidebar:
-        # Logo dalam sidebar
-        st.image(logo_url, width=100)
+        # Cuba panggil logo dalam sidebar
+        st.image(logo_url, width=150)
         st.markdown("### 🌸 Menu Carian")
         senarai_kelas = sorted(df_master['KELAS'].unique().tolist())
         pilihan = st.selectbox("Pilih Kelas:", ["KESELURUHAN Sekolah"] + senarai_kelas)
@@ -89,8 +85,11 @@ try:
             st.rerun()
         st.write(f"Masa: {datetime.now().strftime('%H:%M:%S')}")
 
-    # Logo Utama di Tengah
-    st.image(logo_url, width=120)
+    # Paparan Logo Tengah
+    col_a, col_b, col_c = st.columns([1, 1, 1])
+    with col_b:
+        st.image(logo_url, width=150)
+
     st.markdown(f"<h1>🎀 Portal Analisis Ralat SKTB 🎀</h1>", unsafe_allow_html=True)
     
     # BUTANG PINK DINAMIK
@@ -118,9 +117,9 @@ try:
         df_g = df_display.groupby('KELAS')['TOTAL_RALAT'].sum().reset_index()
         fig = px.bar(df_g, x='KELAS', y='TOTAL_RALAT', color='KELAS', color_discrete_sequence=px.colors.qualitative.Pastel)
     else:
-        df_c = df_display[ralat_list].notna().sum().reset_index()
-        df_c.columns = ['Kategori', 'Jumlah']
-        fig = px.bar(df_c, x='Kategori', y='Jumlah', color='Kategori', color_discrete_sequence=px.colors.qualitative.Pastel)
+        df_cat = df_display[ralat_list].notna().sum().reset_index()
+        df_cat.columns = ['Kategori', 'Jumlah']
+        fig = px.bar(df_cat, x='Kategori', y='Jumlah', color='Kategori', color_discrete_sequence=px.colors.qualitative.Pastel)
 
     fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
