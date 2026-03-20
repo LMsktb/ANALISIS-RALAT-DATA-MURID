@@ -27,12 +27,12 @@ st.markdown("""
     /* --- BAHAGIAN YANG DIUBAH: Tajuk Kad (h4) --- */
     .metric-card h4 { 
         color: #555; 
-        font-size: 18px;    /* Saiz asal 14px, sekarang 18px */
+        font-size: 22px;    /* Saiz asal 14px, sekarang 22px */
         font-weight: bold;  /* Buat jadi Bold */
         margin-bottom: 8px; 
     }
     
-    .metric-card h2 { color: #ff4d88; margin: 0; font-size: 32px; font-weight: bold; }
+    .metric-card h2 { color: #ff4d88; margin: 0; font-size: 34px; font-weight: bold; }
     
     /* Tajuk Portal */
     h1 { color: #ff4d88; text-align: center; font-family: 'Comic Sans MS', cursive; margin-top: -10px; padding-top: 0; }
