@@ -91,7 +91,7 @@ try:
     # SIDEBAR
     with st.sidebar:
     # Logo Sidebar (Saiz kecil & kemas)
-    st.image(logo_url, width=100) 
+    st.image(logo_url, width=90) 
     st.markdown("### 🌸 Menu Carian")
     # ... sambungan kod selectbox anda ...
         senarai_kelas = sorted(df_master['KELAS'].unique().tolist())
