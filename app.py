@@ -61,7 +61,7 @@ try:
 
     # --- LOGO TENGAH ---
     # Gunakan 3 column, letak imej kat tengah (col2)
-    col1, col2, col3 = st.columns([1, 0.2, 1])
+    col1, col2, col3 = st.columns([1, 0.3, 1])
     with col2:
         st.image(logo_url, use_container_width=True)
 
