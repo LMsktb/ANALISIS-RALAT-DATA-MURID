@@ -3,24 +3,18 @@ import pandas as pd
 import plotly.express as px
 from datetime import datetime
 
-# 1. KONFIGURASI HALAMAN (Mesti baris pertama selepas import)
+# 1. KONFIGURASI HALAMAN
 st.set_page_config(page_title="idMe Analysis SKTB", layout="wide", page_icon="🎀")
 
-# Gantikan bahagian logo_url lama dengan ini:
+# 2. PAUTAN LOGO
 logo_id = "1XV1CIEWhms8jHqJGOKpSluqr7cxtSWrv"
 logo_url = f"https://drive.google.com/thumbnail?id={logo_id}&sz=w500"
 
-# 3. TEMA CSS (Pink & Kedudukan Tengah)
+# 3. TEMA CSS
 st.markdown("""
     <style>
     .stApp { background-color: #fdf2f5; }
-    
-    /* Center the image specifically */
-    [data-testid="stHorizontalBlock"] {
-        align-items: center;
-    }
-    
-    /* Card Styles */
+    [data-testid="stHorizontalBlock"] { align-items: center; }
     .card-container { display: flex; justify-content: space-around; gap: 10px; margin-bottom: 20px; }
     .metric-card {
         background-color: white; padding: 20px; border-radius: 15px;
@@ -29,24 +23,18 @@ st.markdown("""
     }
     .metric-card h4 { color: #888; font-size: 14px; margin-bottom: 5px; }
     .metric-card h2 { color: #ff4d88; margin: 0; font-size: 28px; }
-    
-    /* Typography */
     h1 { color: #ff4d88; text-align: center; font-family: 'Comic Sans MS', cursive; margin-top: -10px; padding-top: 0; }
     h3 { color: #ff4d88; font-family: 'Comic Sans MS', cursive; }
-    
-    /* Button */
     .edit-button {
         background-color: #ff4d88; color: white !important; padding: 12px 25px;
         text-align: center; border-radius: 12px; text-decoration: none;
         display: inline-block; font-weight: bold; margin-bottom: 25px; border: 2px solid #ffb6c1;
     }
-    
-    /* Sidebar */
     section[data-testid="stSidebar"] { background-color: #fff0f5; border-right: 2px solid #ffc1d6; }
     </style>
     """, unsafe_allow_html=True)
 
-# 4. URL DATA & SETTING GOOGLE SHEETS
+# 4. URL DATA
 url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSC4K9zTk5to3U37As72duwLP7GRqYMkauaAhjr6ANe8s6bl7Qz85ojUXeSDOYw3-iQkMvKV-gq4ZXf/pub?gid=272260181&single=true&output=csv"
 base_edit = "https://docs.google.com/spreadsheets/d/1y8BvpG0NN5WwwhSFWNS2AOI4Qe8O4HYg5M-LPrMmzjk/edit?"
 
@@ -78,7 +66,6 @@ def load_data():
     df.columns = [str(c).strip().upper() for c in df.columns]
     df.rename(columns={df.columns[0]: 'KELAS', df.columns[1]: 'NAMA_MURID'}, inplace=True)
     df = df[df['KELAS'].astype(str).str.contains('IBNU|PRA|PPKI', case=False, na=False)]
-    
     ralat_cols = ['ALAMAT', 'POSKOD', 'TIADA P1', 'TIADA P2', 'P1 = P2', 'HUB P1', 'HUB P2', 'TANGGUNGAN', 'TIADA HP P1', 'PENDAPATAN', 'AKAUN OKU']
     existing_ralat = [c for c in ralat_cols if c in df.columns]
     df['TOTAL_RALAT'] = df[existing_ralat].notna().sum(axis=1)
@@ -88,12 +75,10 @@ def load_data():
 try:
     df_master, ralat_list = load_data()
     
-    # SIDEBAR
+    # --- SIDEBAR ---
     with st.sidebar:
-    # Logo Sidebar (Saiz kecil & kemas)
-    st.image(logo_url, width=90) 
-    st.markdown("### 🌸 Menu Carian")
-    # ... sambungan kod selectbox anda ...
+        st.image(logo_url, width=90) 
+        st.markdown("### 🌸 Menu Carian")
         senarai_kelas = sorted(df_master['KELAS'].unique().tolist())
         pilihan = st.selectbox("Pilih Kelas:", ["KESELURUHAN Sekolah"] + senarai_kelas)
         if st.button('🔄 Refresh'):
@@ -101,26 +86,19 @@ try:
             st.rerun()
         st.write(f"Masa: {datetime.now().strftime('%H:%M:%S')}")
 
-   # --- Susunan Logo Tengah ---
-# Nisbah 0.3 akan mengecilkan logo lebih sikit daripada yang tadi
-col1, col_logo, col3 = st.columns([1, 0.3, 1]) 
+    # --- LOGO TENGAH ---
+    col1, col_logo, col3 = st.columns([1, 0.3, 1]) 
+    with col_logo:
+        st.image(logo_url, use_container_width=True)
 
-with col_logo:
-    st.image(logo_url, use_container_width=True)
-
-# Tajuk tepat di bawah logo
-st.markdown("<h1 style='text-align: center; color: #ff4d88; font-family: \"Comic Sans MS\", cursive;'>🎀 Portal Analisis Ralat SKTB 🎀</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; color: #ff4d88; font-family: \"Comic Sans MS\", cursive;'>🎀 Portal Analisis Ralat SKTB 🎀</h1>", unsafe_allow_html=True)
     
-    # BUTANG EDIT
+    # --- ISI KANDUNGAN ---
     link_edit = link_setiap_kelas.get(pilihan, link_setiap_kelas["KESELURUHAN Sekolah"])
     st.markdown(f'<center><a href="{link_edit}" target="_blank" class="edit-button">📝 Klik Untuk Kemaskini Data {pilihan}</a></center>', unsafe_allow_html=True)
 
-    # FILTER DATA
     df_display = df_master if pilihan == "KESELURUHAN Sekolah" else df_master[df_master['KELAS'] == pilihan]
-    
-    # KAD STATISTIK
     total_r = int(df_display['TOTAL_RALAT'].sum())
-    # Anda boleh tukar logik kelas_terbaik di bawah jika perlu dinamik
     kelas_terbaik = "6 IBNU SINA"
 
     st.markdown(f"""
@@ -132,28 +110,23 @@ st.markdown("<h1 style='text-align: center; color: #ff4d88; font-family: \"Comic
     </div>
     """, unsafe_allow_html=True)
 
-    # GRAF BAR
     if pilihan == "KESELURUHAN Sekolah":
         df_g = df_display.groupby('KELAS')['TOTAL_RALAT'].sum().reset_index()
-        fig = px.bar(df_g, x='KELAS', y='TOTAL_RALAT', color='KELAS', 
-                     color_discrete_sequence=px.colors.qualitative.Pastel)
+        fig = px.bar(df_g, x='KELAS', y='TOTAL_RALAT', color='KELAS', color_discrete_sequence=px.colors.qualitative.Pastel)
     else:
         df_cat = df_display[ralat_list].notna().sum().reset_index()
         df_cat.columns = ['Kategori', 'Jumlah']
-        fig = px.bar(df_cat, x='Kategori', y='Jumlah', color='Kategori', 
-                     color_discrete_sequence=px.colors.qualitative.Pastel)
+        fig = px.bar(df_cat, x='Kategori', y='Jumlah', color='Kategori', color_discrete_sequence=px.colors.qualitative.Pastel)
 
     fig.update_layout(plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)', showlegend=False)
     st.plotly_chart(fig, use_container_width=True)
 
-    # JADUAL DATA
     st.markdown("### 📋 Senarai Murid Perlu Tindakan")
     df_ralat = df_display[df_display['TOTAL_RALAT'] > 0]
     if not df_ralat.empty:
-        st.dataframe(df_ralat[['KELAS', 'NAMA_MURID'] + ralat_list].fillna(''), 
-                     use_container_width=True, hide_index=True)
+        st.dataframe(df_ralat[['KELAS', 'NAMA_MURID'] + ralat_list].fillna(''), use_container_width=True, hide_index=True)
     else:
         st.success(f"🎉 Tahniah! Kelas {pilihan} sudah tiada ralat.")
 
 except Exception as e:
-    st.error(f"Sila Refresh atau periksa sambungan internet: {e}")
+    st.error(f"Sila Refresh: {e}")
