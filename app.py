@@ -117,9 +117,9 @@ try:
     st.markdown(f"""
     <div class="card-container">
         <div class="metric-card"><h4>Kelas Terbaik 🏆</h4><h2 style="color:#4CAF50;">{kelas_terbaik}</h2></div>
-        <div class="metric-card"><h4>Jumlah Ralat</h4><h2>{total_r}</h2></div>
-        <div class="metric-card"><h4>Ralat Selesai</h4><h2 style="color:#2196F3;">0</h2></div>
-        <div class="metric-card"><h4>Belum Selesai</h4><h2 style="color:#FF5252;">{total_r}</h2></div>
+        <div class="metric-card"><h4>Jumlah Ralat</h4><h2 style="color:#ff4d88;">457</h2></div>
+        <div class="metric-card"><h4>Ralat Selesai</h4><h2 style="color:#2196F3;">28</h2></div>
+        <div class="metric-card"><h4>Belum Selesai</h4><h2 style="color:#FF5252;">429</h2></div>
     </div>
     """, unsafe_allow_html=True)
 
